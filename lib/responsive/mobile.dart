@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 
 import '../screens/add_post.dart';
+import '../screens/chatHome.dart';
 import '../screens/home.dart';
 import '../screens/profile.dart';
 import '../screens/search.dart';
@@ -62,7 +63,7 @@ class _MobileScerrenState extends State<MobileScerren> {
                 label: ""),
             BottomNavigationBarItem(
                 icon: Icon(
-                  Icons.favorite,
+                  Icons.chat,
                   color: currentPage == 3 ? primaryColor : secondaryColor,
                 ),
                 label: ""),
@@ -84,7 +85,7 @@ class _MobileScerrenState extends State<MobileScerren> {
           Home(),
           Search(),
           AddPost(),
-          Center(child: Text("Love u ♥")),
+          Chatshome(),
           Profile(uiddd: FirebaseAuth.instance.currentUser!.uid,),
         ],
       ),

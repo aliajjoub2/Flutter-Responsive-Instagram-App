@@ -71,9 +71,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
               return Expanded(
                 child: ListView(
                   children:
-                      snapshot.data!.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> data =
-                        document.data()! as Map<String, dynamic>;
+                    snapshot.data!.docs.map((DocumentSnapshot document) {
+                      
+                    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+
                     return Container(
                       margin: EdgeInsets.only(bottom: 15),
                       child: SingleChildScrollView(
@@ -134,7 +135,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                     onPressed: () {}, icon: Icon(Icons.favorite))
                               ],
                             ),
-                              SizedBox(
+                            SizedBox(
                                           width: 250,
                                           child: Text(data["textComment"],
                                               style: const TextStyle(fontSize: 16)),
@@ -146,6 +147,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   }).toList(),
                 ),
               );
+            
             },
           ),
           widget.showTextField

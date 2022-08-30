@@ -2,10 +2,12 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:uuid/uuid.dart';
 
-
 import '../models/post.dart';
+import '../models/singleChat.dart';
 import '../shared/snackbar.dart';
 import 'storage.dart';
 
@@ -61,6 +63,41 @@ class FirestoreMethods {
     showSnackBar(context, message);
   }
 
+  //----------------------------------------
+
+  uploadSingleChat(
+      {required context, required chatingMembers, required chatingId}) async {
+    String message = "ERROR => Not starting the code";
+
+    try {
+// firebase firestore (Database)
+      CollectionReference singleChatCollection =
+          FirebaseFirestore.instance.collection('chating');
+
+      SingleChatData singleChatContent = SingleChatData(
+        datePublished: DateTime.now(),
+        chatingId: chatingId,
+        chatingMembers: chatingMembers,
+      );
+
+      message = "ERROR => erroe hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+      singleChatCollection
+          .doc(chatingId)
+          .set(singleChatContent.convert2ChatMap())
+          .then((value) => print("done................"))
+          .catchError((error) => print("Failed to post: $error"));
+
+      message = " Chat created successfully ♥ ♥";
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, "ERROR :  ${e.code} ");
+    } catch (e) {
+      print(e);
+    }
+
+    showSnackBar(context, message);
+  }
+
+//-----------------------------------------------------------------
   uploadComment(
       {required commentText,
       required postId,
@@ -109,5 +146,15 @@ class FirestoreMethods {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  //-------------------
+// functoin to get user details from Firestore (Database), we use this function for provider
+   getChatID({required itemSingleChat}) async {
+     var snap2 = await FirebaseFirestore.instance
+        .collection('chating')
+        .where('chatingMembers', isEqualTo: itemSingleChat)
+        .get() ;
+    return SingleChatData.convertSnapChatModel(snap2);
   }
 }

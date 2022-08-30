@@ -8,6 +8,8 @@ import '../shared/snackbar.dart';
 import 'storage.dart';
 
 class AuthMethods {
+
+  // start register 
   register({
     required emailll,
     required passworddd,
@@ -28,14 +30,14 @@ class AuthMethods {
 
       message = "ERROR => Registered only";
 
-// to storage the data ______________________________________________________________________
+      // to storage the data ______________________________________________________________________
 
-      String urlll = await getImgURL(imgName: imgName, imgPath: imgPath, folderName: 'profileIMG');
+            String urlll = await getImgURL(imgName: imgName, imgPath: imgPath, folderName: 'profileIMG');
 
-// _______________________________________________________________________
-// firebase firestore (Database)
-      CollectionReference users =
-          FirebaseFirestore.instance.collection('userSSS');
+      // _______________________________________________________________________
+      // firebase firestore (Database)
+            CollectionReference users =
+                FirebaseFirestore.instance.collection('userSSS');
 
       UserDate userr = UserDate(
           email: emailll,
@@ -62,7 +64,9 @@ class AuthMethods {
 
     showSnackBar(context, message);
   }
+// end register
 
+// start signIn
   signIn({required emailll, required passworddd, required context}) async {
     try {
       final credential = await FirebaseAuth.instance
@@ -73,8 +77,9 @@ class AuthMethods {
       print(e);
     }
   }
+// end  signIn
 
-  // functoin to get user details from Firestore (Database)
+// functoin to get user details from Firestore (Database), we use this function for provider
   Future<UserDate> getUserDetails() async {
     DocumentSnapshot snap = await FirebaseFirestore.instance
         .collection('userSSS')
