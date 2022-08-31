@@ -27,6 +27,7 @@ class CommentsScreen extends StatefulWidget {
 
 class _CommentsScreenState extends State<CommentsScreen> {
   final commentController = TextEditingController();
+  
 
   @override
   void dispose() {
@@ -196,5 +197,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
         ],
       ),
     );
+  
   }
 }

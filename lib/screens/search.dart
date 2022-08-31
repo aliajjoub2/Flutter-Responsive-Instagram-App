@@ -69,6 +69,9 @@ class _SearchState extends State<Search> {
                           MaterialPageRoute(
                               builder: (context) => Profile(
                                     uiddd: snapshot.data!.docs[index]["uid"],
+                                    username: snapshot.data!.docs[index]["username"],
+                                    imagPath: snapshot.data!.docs[index]["profileImg"]
+
                                   )),
                         );
                       },

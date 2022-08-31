@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
+import '../provider/user_provider.dart';
 import '../screens/add_post.dart';
 import '../screens/chatHome.dart';
 import '../screens/home.dart';
+import '../screens/myProfile.dart';
 import '../screens/profile.dart';
 import '../screens/search.dart';
 import '../shared/colors.dart';
@@ -30,6 +33,8 @@ class _MobileScerrenState extends State<MobileScerren> {
 
   @override
   Widget build(BuildContext context) {
+     
+     
     return Scaffold(
       bottomNavigationBar: CupertinoTabBar(
           backgroundColor: mobileBackgroundColor,
@@ -86,7 +91,7 @@ class _MobileScerrenState extends State<MobileScerren> {
           Search(),
           AddPost(),
           Chatshome(),
-          Profile(uiddd: FirebaseAuth.instance.currentUser!.uid,),
+          MyProfile(),
         ],
       ),
     );

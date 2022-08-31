@@ -123,7 +123,30 @@ class FirestoreMethods {
       print("emptyyyyyyyy");
     }
   }
-
+// upload chat detaile to user page -----------------------------
+ uploadChatfriends(
+      {required chatId,
+      required username,
+      required imagPath,
+      required userID,
+      }) async {
+    
+      
+      await FirebaseFirestore.instance
+          .collection("userSSS")
+          .doc(userID)
+          .collection("chatFriends")
+          .doc(chatId)
+          .set({
+        "chatId": chatId,
+        "username": username,
+        "dataPublished": DateTime.now(),
+        "imagPath": imagPath,
+        
+      });
+   
+  }
+//---------------------------------
   toggleLike({required Map postData}) async {
     try {
       if (postData["likes"].contains(FirebaseAuth.instance.currentUser!.uid)) {

@@ -2,8 +2,10 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
+import '../provider/user_provider.dart';
 import '../screens/add_post.dart';
 import '../screens/home.dart';
 import '../screens/profile.dart';
@@ -30,6 +32,7 @@ class _WebScerrenState extends State<WebScerren> {
 
   @override
   Widget build(BuildContext context) {
+     final userData = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -96,7 +99,9 @@ class _WebScerrenState extends State<WebScerren> {
           Search(),
           AddPost(),
           Center(child: Text("Love u ♥")),
-          Profile(uiddd: FirebaseAuth.instance.currentUser!.uid,),
+          Profile(uiddd: FirebaseAuth.instance.currentUser!.uid,
+          username: userData!.username ,
+          imagPath: userData.profileImg),
         ],
       ),
     );

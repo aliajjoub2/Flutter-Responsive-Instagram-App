@@ -4,16 +4,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:instegram/screens/home.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../firebase_services/firestore.dart';
+import '../provider/user_provider.dart';
 import '../shared/colors.dart';
 import 'chatingOneToOne.dart';
 
 class Profile extends StatefulWidget {
   final String uiddd;
+  final String imagPath;
+  final String username;
 
-  const Profile({Key? key, required this.uiddd}) : super(key: key);
+  const Profile(
+      {Key? key,
+      required this.uiddd,
+      required this.imagPath,
+      required this.username})
+      : super(key: key);
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -28,7 +37,7 @@ class _ProfileState extends State<Profile> {
   late int following;
   late int postCount;
   late bool showFollow;
-
+// get number zhe folower and fowlling and
   getData() async {
     // Get data from DB
 
@@ -66,75 +75,6 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  getChatMembers() async {
-    // Get data from DB
-
-    try {
-      //To get posts length
-      List itemSingleChat = [
-        FirebaseAuth.instance.currentUser!.uid,
-        widget.uiddd
-      ];
-      itemSingleChat.sort();
-
-      var snapshotChatMember = await FirebaseFirestore.instance
-          .collection('chating')
-          .where('chatingMembers', isEqualTo: itemSingleChat)
-          .get();
-      print('--------');
-      print(snapshotChatMember.docs.length);
-      print(snapshotChatMember);
-      print('-------');
-      if (snapshotChatMember.docs.length == 0) {
-        String chatingId = const Uuid().v1();
-        //FirebaseFirestore.instance.collection('chating').add(data)
-        await FirestoreMethods().uploadSingleChat(
-            context: context,
-            chatingMembers: itemSingleChat,
-            chatingId: chatingId);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatingOneToOne(
-                itemSingleChat: itemSingleChat, chatingId: chatingId),
-          ),
-        );
-      } else {
-        print('here before ali');
-        await FirebaseFirestore.instance
-            .collection('chating')
-            .where('chatingMembers', isEqualTo: itemSingleChat)
-            .get()
-            .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            var chatingId = doc["chatingId"];
-              Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatingOneToOne(
-                  itemSingleChat: itemSingleChat, chatingId: chatingId),
-            ),
-          );
-          }
-        });
-        
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-
-    //     List<String> item = ["en", "it"];
-    //   var sref;
-    // var coll  = await FirebaseFirestore.instance
-    //           .collection("chating");
-    // for (int i = 0; i < item.length; i++) {
-
-    //           sref = coll.where("models", arrayContains: item[i]);
-    //           print(sref.toString().isEmpty); //something like this
-    // }
-    // // finally
-  }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -145,6 +85,9 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    // provider of user Data
+    final userData = Provider.of<UserProvider>(context).getUser;
+    // screen width
     final double widthScreen = MediaQuery.of(context).size.width;
     if (isLoading) {
       return Scaffold(
@@ -255,6 +198,8 @@ class _ProfileState extends State<Profile> {
                 )
               ],
             ),
+
+            // title
             Container(
                 margin: EdgeInsets.fromLTRB(33, 21, 0, 0),
                 width: double.infinity,
@@ -269,9 +214,101 @@ class _ProfileState extends State<Profile> {
             SizedBox(
               height: 9,
             ),
+            // chatinh button
             ElevatedButton(
-              onPressed: () {
-                getChatMembers();
+              onPressed: () async {
+                try {
+                  //To get posts length
+                  List itemSingleChat = [
+                    FirebaseAuth.instance.currentUser!.uid,
+                    widget.uiddd
+                  ];
+                  itemSingleChat.sort();
+
+                  var snapshotChatMember = await FirebaseFirestore.instance
+                      .collection('chating')
+                      .where('chatingMembers', isEqualTo: itemSingleChat)
+                      .get();
+                  print('--------');
+                  print(snapshotChatMember.docs.length);
+
+                  print('-------');
+                  if (snapshotChatMember.docs.length == 0) {
+                    String chatingId = const Uuid().v1();
+                    //FirebaseFirestore.instance.collection('chating').add(data)
+                    await FirestoreMethods().uploadSingleChat(
+                        context: context,
+                        chatingMembers: itemSingleChat,
+                        chatingId: chatingId);
+
+                   await  FirestoreMethods().uploadChatfriends(
+                      chatId: chatingId,
+                      userID: widget.uiddd,
+                      imagPath: userData!.profileImg,
+                      username: userData.username,
+                    );
+                   await FirestoreMethods().uploadChatfriends(
+                      chatId: chatingId,
+                      userID: FirebaseAuth.instance.currentUser!.uid,
+                      imagPath: widget.imagPath,
+                      username: widget.username,
+                    );
+
+                    // add chat informationen to user Account
+                    // await FirebaseFirestore.instance
+                    //     .collection("userSSS")
+                    //     .doc(widget.uiddd)
+                    //     .update({
+                    //   "chatFriends": FieldValue.arrayUnion([
+                    //     {
+                    //       'chatId': chatingId,
+                    //       'username': userData!.username,
+                    //       'imagPath': userData.profileImg
+                    //     }
+                    //   ])
+                    // });
+
+                    // await FirebaseFirestore.instance
+                    //     .collection("userSSS")
+                    //     .doc(FirebaseAuth.instance.currentUser!.uid)
+                    //     .update({
+                    //   "chatFriends": FieldValue.arrayUnion([
+                    //     {
+                    //       'chatId': chatingId,
+                    //       'username': widget.username,
+                    //       'imagPath': widget.imagPath
+                    //     }
+                    //   ])
+                    // });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ChatingOneToOne(chatingId: chatingId),
+                      ),
+                    );
+                  } else {
+                    print('here before ali');
+                    await FirebaseFirestore.instance
+                        .collection('chating')
+                        .where('chatingMembers', isEqualTo: itemSingleChat)
+                        .get()
+                        .then((QuerySnapshot querySnapshot) {
+                      for (var doc in querySnapshot.docs) {
+                        var chatingId = doc["chatingId"];
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ChatingOneToOne(chatingId: chatingId),
+                          ),
+                        );
+                      }
+                    });
+                  }
+                } catch (e) {
+                  print(e.toString());
+                }
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(
@@ -292,6 +329,7 @@ class _ProfileState extends State<Profile> {
             SizedBox(
               height: 30,
             ),
+            // Edit profile and Logout
             widget.uiddd == FirebaseAuth.instance.currentUser!.uid
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -361,7 +399,7 @@ class _ProfileState extends State<Profile> {
                     ?
 
 // ____________________________________________________________
-
+// unfollow buttom
                     ElevatedButton(
                         onPressed: () async {
                           followers--;
@@ -403,6 +441,7 @@ class _ProfileState extends State<Profile> {
                           style: TextStyle(fontSize: 17),
                         ),
                       )
+// Follow buttom
                     : ElevatedButton(
                         onPressed: () async {
                           followers++;
@@ -454,6 +493,7 @@ class _ProfileState extends State<Profile> {
             SizedBox(
               height: 19,
             ),
+            // posts of user
             FutureBuilder(
               future: FirebaseFirestore.instance
                   .collection('postSSS')
