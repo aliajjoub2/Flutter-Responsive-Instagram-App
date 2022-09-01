@@ -77,15 +77,28 @@ class _ChatshomeState extends State<Chatshome> {
                                 ),
                               ),
                           ),
+                          trailing: SizedBox(
+                            width: 50,
+
+                            child: Row(children: [
+                               Text(data['unreadNumber'].toString()),
+                              
+                            ],),
+                          ),
                           onTap: () {
+
+                            // here muss delete the unread Number
                                 Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ChatingOneToOne(
                                   chatingId: data['chatId'],
+                                  uiddd: data['userId']
                                 ),
                               ),
                             );
+
+                            // muss send the statue will true and send userid for another user with data back
                           }),
                     );
                   }).toList(),
@@ -93,6 +106,7 @@ class _ChatshomeState extends State<Chatshome> {
               );
             },
           ),
+        
         ],
       ),
     );

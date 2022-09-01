@@ -123,18 +123,45 @@ class FirestoreMethods {
       print("emptyyyyyyyy");
     }
   }
+// upload message in chating ont to one page
+  uploadMessage(
+      {required messsageText,
+      required chatingID,
+      
+      required username,
+      required uid}) async {
+    if (messsageText.isNotEmpty) {
+      String messageID = const Uuid().v1();
+      await FirebaseFirestore.instance
+          .collection("chating")
+          .doc(chatingID)
+          .collection("chats_content")
+          .doc(messageID)
+          .set({
+        
+        "username": username,
+        "message": messsageText,
+        "dataPublished": DateTime.now(),
+        "uid": uid,
+        "messageId": messageID
+      });
+    } else {
+      print("empty message");
+    }
+  }
 // upload chat detaile to user page -----------------------------
  uploadChatfriends(
       {required chatId,
       required username,
       required imagPath,
-      required userID,
+      required toUserID,
+      required userId,
       }) async {
     
       
       await FirebaseFirestore.instance
           .collection("userSSS")
-          .doc(userID)
+          .doc(toUserID)
           .collection("chatFriends")
           .doc(chatId)
           .set({
@@ -142,6 +169,7 @@ class FirestoreMethods {
         "username": username,
         "dataPublished": DateTime.now(),
         "imagPath": imagPath,
+        "userId": userId
         
       });
    

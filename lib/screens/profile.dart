@@ -243,15 +243,17 @@ class _ProfileState extends State<Profile> {
 
                    await  FirestoreMethods().uploadChatfriends(
                       chatId: chatingId,
-                      userID: widget.uiddd,
+                      toUserID: widget.uiddd,
                       imagPath: userData!.profileImg,
                       username: userData.username,
+                      userId: userData.uid,
                     );
                    await FirestoreMethods().uploadChatfriends(
                       chatId: chatingId,
-                      userID: FirebaseAuth.instance.currentUser!.uid,
+                      toUserID: FirebaseAuth.instance.currentUser!.uid,
                       imagPath: widget.imagPath,
                       username: widget.username,
+                      userId: widget.uiddd,
                     );
 
                     // add chat informationen to user Account
