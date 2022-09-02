@@ -14,6 +14,7 @@ import '../shared/contants.dart';
 class ChatingOneToOne extends StatefulWidget {
   final chatingId;
   final uiddd;
+ 
   const ChatingOneToOne({Key? key, required this.chatingId, this.uiddd})
       : super(key: key);
 
@@ -22,30 +23,46 @@ class ChatingOneToOne extends StatefulWidget {
 }
 
 class _ChatingOneToOneState extends State<ChatingOneToOne> {
+  List messsageTexts = [];
   Map userDate = {};
-  
+
   final messageController = TextEditingController();
-  
-   bool status= false;
+
+  bool status = false;
 
   getDataFromcahtFriends() async {
     // Get data from DB
-    var collection = FirebaseFirestore.instance.collection('userSSS');
-    var docSnapshot = await collection
+
+    FirebaseFirestore.instance
+        .collection('userSSS')
         .doc(widget.uiddd)
         .collection('chatFriends')
         .doc(widget.chatingId)
-        .get();
-    if (docSnapshot.exists) {
-      Map<String, dynamic>? data = docSnapshot.data();
-       status = data!['status'];
-      print('here status ------------');
-      print(status); // <-- The value you want to retrieve.
-      // Call setState if needed.
-    }
-    setState(() {
-      
+        .snapshots()
+        .listen((event) {
+      status = event.data()!['status'];
+
+      print(status);
     });
+    FirebaseFirestore.instance
+        .collection('userSSS')
+        .doc(widget.uiddd)
+        .collection('chatFriends')
+        .doc(widget.chatingId)
+        .snapshots()
+        .listen((event) {
+      messsageTexts = event.data()!['unreadMessages'];
+
+      print(messsageTexts);
+    });
+    setState(() {});
+    // if (docSnapshot.exists) {
+    //   Map<String, dynamic>? data = docSnapshot.data();
+    //    status = data!['status'];
+    //   print('here status ------------');
+    //   print(status); // <-- The value you want to retrieve.
+    //   // Call setState if needed.
+    // }
 
     // try {
     //   DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
@@ -104,9 +121,8 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
       appBar: AppBar(
         backgroundColor: Colors.amber,
         title: Text(
-          //userData!.username,
-          status.toString()
-        ),
+            //userData!.username,
+            status ? 'online' : ''),
       ),
       body: Column(
         children: [
@@ -133,10 +149,22 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
                     Map<String, dynamic> data =
                         document.data()! as Map<String, dynamic>;
 
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 15),
-                      child: Text(data['message']),
-                    );
+                    return (data['uid'] ==
+                            FirebaseAuth.instance.currentUser!.uid)
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                color: Color.fromARGB(255, 41, 36, 23),
+                                margin: EdgeInsets.only(bottom: 15),
+                                child: Text(data['message']),
+                              ),
+                            ],
+                          )
+                        : Container(
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Text(data['message']),
+                          );
                   }).toList(),
                 ),
               );
@@ -148,8 +176,6 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
             margin: EdgeInsets.only(bottom: 12),
             child: Row(
               children: [
-                
-                
                 Container(
                   margin: EdgeInsets.only(right: 12),
                   padding: EdgeInsets.all(5),
@@ -172,6 +198,7 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
                           hintText: "Message as  ${userData.username}  ",
                           suffixIcon: IconButton(
                               onPressed: () async {
+                                messsageTexts.add(messageController.text);
                                 await FirestoreMethods().uploadMessage(
                                     chatingID: widget.chatingId,
                                     messsageText: messageController.text,
@@ -180,6 +207,13 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
 
                                 // add unreadNumber(); if statue is not true make function to increase the unreadNumber
 
+                                if (!status) {
+                                  await FirestoreMethods().uploadNotivigation(
+                                    chatId: widget.chatingId,
+                                    messsageText: messsageTexts,
+                                    toUserID: widget.uiddd,
+                                  );
+                                }
                                 messageController.clear();
                               },
                               icon: Icon(Icons.send)))),

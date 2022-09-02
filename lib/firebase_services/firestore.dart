@@ -157,7 +157,7 @@ class FirestoreMethods {
       required toUserID,
       required userId,
       }) async {
-    
+    bool status= false;
       
       await FirebaseFirestore.instance
           .collection("userSSS")
@@ -169,9 +169,37 @@ class FirestoreMethods {
         "username": username,
         "dataPublished": DateTime.now(),
         "imagPath": imagPath,
-        "userId": userId
+        "userId": userId,
+        "status": status
         
       });
+   
+  }
+//---------------------------------
+
+ uploadNotivigation(
+      {required chatId,
+     
+      
+      required toUserID,
+      
+       
+       required List messsageText,
+      }) async {
+    
+      
+      await FirebaseFirestore.instance
+          .collection("userSSS")
+          .doc(toUserID)
+          .collection("chatFriends")
+          .doc(chatId)
+          .set({
+        
+        "lastMessage": DateTime.now(),
+        
+        "unreadMessages": messsageText,
+        
+      }, SetOptions(merge: true),);
    
   }
 //---------------------------------

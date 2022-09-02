@@ -60,43 +60,69 @@ class _ChatshomeState extends State<Chatshome> {
                       margin: const EdgeInsets.symmetric(vertical: 10),
                       child: ListTile(
                           title: Text(data['username']),
-                          leading:  SizedBox(
+                          leading: SizedBox(
                             width: 70,
                             height: 70,
                             child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(
-                                  data['imagPath'],
-                                  loadingBuilder: (context, child, progress) {
-                                    return progress == null
-                                        ? child
-                                        : Center(
-                                            child: CircularProgressIndicator());
-                                  },
-                                  fit: BoxFit.cover,
-                                ),
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                data['imagPath'],
+                                loadingBuilder: (context, child, progress) {
+                                  return progress == null
+                                      ? child
+                                      : Center(
+                                          child: CircularProgressIndicator());
+                                },
+                                fit: BoxFit.cover,
                               ),
+                            ),
                           ),
                           trailing: SizedBox(
                             width: 50,
-
-                            child: Row(children: [
-                               Text(data['unreadNumber'].toString()),
-                              
-                            ],),
+                            child: Row(
+                              children: [
+                                Text(data['unreadMessages'] != null &&
+                                        data['unreadMessages'].length != 0
+                                    ? data['unreadMessages'].length.toString()
+                                    : ''),
+                              ],
+                            ),
                           ),
-                          onTap: () {
-
+                          onTap: () async {
                             // here muss delete the unread Number
-                                Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatingOneToOne(
-                                  chatingId: data['chatId'],
-                                  uiddd: data['userId']
-                                ),
-                              ),
-                            );
+                            await FirebaseFirestore.instance
+                                .collection("userSSS")
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .collection("chatFriends")
+                                .doc(data['chatId'])
+                                .update(
+                                    {"unreadMessages": FieldValue.delete()});
+                                  // change status to true 
+                                    await FirebaseFirestore.instance
+                                .collection("userSSS")
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .collection("chatFriends")
+                                .doc(data['chatId'])
+                                .update(
+                                    {"status": true});
+                            
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatingOneToOne(
+                                      chatingId: data['chatId'],
+                                      uiddd: data['userId']),
+                                )).then((context) async {
+                                  // change status to true 
+                                    await FirebaseFirestore.instance
+                                .collection("userSSS")
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .collection("chatFriends")
+                                .doc(data['chatId'])
+                                .update(
+                                    {"status": false});
+                              
+                            });
 
                             // muss send the statue will true and send userid for another user with data back
                           }),
@@ -106,7 +132,6 @@ class _ChatshomeState extends State<Chatshome> {
               );
             },
           ),
-        
         ],
       ),
     );
