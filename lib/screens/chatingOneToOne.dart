@@ -10,12 +10,14 @@ import '../firebase_services/firestore.dart';
 import '../provider/user_provider.dart';
 import '../shared/colors.dart';
 import '../shared/contants.dart';
+import '../shared/snackbar.dart';
 
 class ChatingOneToOne extends StatefulWidget {
   final chatingId;
   final uiddd;
- 
-  const ChatingOneToOne({Key? key, required this.chatingId, this.uiddd})
+  final username;
+  const ChatingOneToOne(
+      {Key? key, required this.chatingId, this.uiddd, this.username})
       : super(key: key);
 
   @override
@@ -23,12 +25,14 @@ class ChatingOneToOne extends StatefulWidget {
 }
 
 class _ChatingOneToOneState extends State<ChatingOneToOne> {
-  List messsageTexts = [];
+  List unreadMessages = [];
   Map userDate = {};
 
   final messageController = TextEditingController();
 
   bool status = false;
+  bool block = false;
+  bool myblock = false;
 
   getDataFromcahtFriends() async {
     // Get data from DB
@@ -40,22 +44,18 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
         .doc(widget.chatingId)
         .snapshots()
         .listen((event) {
-      status = event.data()!['status'];
-
-      print(status);
+      if (mounted) {
+        setState(() {
+          status = event.data()!['status'];
+          print(status);
+          block = event.data()!['block'];
+          print('status ------------------');
+          print(block);
+          unreadMessages = event.data()!['unreadMessages'];
+        });
+      }
     });
-    FirebaseFirestore.instance
-        .collection('userSSS')
-        .doc(widget.uiddd)
-        .collection('chatFriends')
-        .doc(widget.chatingId)
-        .snapshots()
-        .listen((event) {
-      messsageTexts = event.data()!['unreadMessages'];
 
-      print(messsageTexts);
-    });
-    setState(() {});
     // if (docSnapshot.exists) {
     //   Map<String, dynamic>? data = docSnapshot.data();
     //    status = data!['status'];
@@ -98,6 +98,78 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
     // });
   }
 
+  showOptionsMore_vert() {
+    FirebaseFirestore.instance
+        .collection('userSSS')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('chatFriends')
+        .doc(widget.chatingId)
+        .get()
+        .then((event) {
+      setState(() {
+        myblock = event.data()!['block'];
+        print(myblock);
+      });
+    });
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          children: [
+            myblock
+                ? SimpleDialogOption(
+                    onPressed: () async {
+                      await FirebaseFirestore.instance
+                          .collection("userSSS")
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("chatFriends")
+                          .doc(widget.chatingId)
+                          .update({"block": false});
+                      setState(() {
+                        myblock = false;
+                      });
+
+                      Navigator.pop(context);
+                      showSnackBar(context, '${widget.username} are Unblocked');
+                    },
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Unblock",
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  )
+                : SimpleDialogOption(
+                    onPressed: () async {
+                      await FirebaseFirestore.instance
+                          .collection("userSSS")
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("chatFriends")
+                          .doc(widget.chatingId)
+                          .update({"block": true});
+                      setState(() {
+                        myblock = true;
+                      });
+
+                      Navigator.pop(context);
+                      showSnackBar(context, '${widget.username} are Blocked');
+                    },
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Block",
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     messageController.dispose();
@@ -122,7 +194,19 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
         backgroundColor: Colors.amber,
         title: Text(
             //userData!.username,
-            status ? 'online' : ''),
+            status ? '${widget.username} is online' : widget.username),
+        actions: [
+          // start search bottom
+          IconButton(
+            onPressed: () {
+              showOptionsMore_vert();
+            },
+            icon: Icon(Icons.more_vert),
+            color: Colors.blueAccent,
+            iconSize: 33,
+          ),
+        ],
+        elevation: 20,
       ),
       body: Column(
         children: [
@@ -172,55 +256,59 @@ class _ChatingOneToOneState extends State<ChatingOneToOne> {
           ),
 
           // start input text message
-          Container(
-            margin: EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Container(
-                  margin: EdgeInsets.only(right: 12),
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color.fromARGB(125, 78, 91, 110),
-                  ),
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(userData!.profileImg),
-                    radius: 26,
+          (block == true)
+              ? Text('You are blocked')
+              : Container(
+                  margin: EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(right: 12),
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color.fromARGB(125, 78, 91, 110),
+                        ),
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(userData!.profileImg),
+                          radius: 26,
+                        ),
+                      ),
+                      Expanded(
+                        child: TextField(
+                            controller: messageController,
+                            keyboardType: TextInputType.text,
+                            maxLines: 4,
+                            obscureText: false,
+                            decoration: decorationTextfield.copyWith(
+                                hintText: "Message as  ${userData.username}  ",
+                                suffixIcon: IconButton(
+                                    onPressed: () async {
+                                      unreadMessages
+                                          .add(messageController.text);
+                                      await FirestoreMethods().uploadMessage(
+                                          chatingID: widget.chatingId,
+                                          messsageText: messageController.text,
+                                          username: userData.username,
+                                          uid: userData.uid);
+
+                                      // add unreadNumber(); if statue is not true make function to increase the unreadNumber
+
+                                      if (!status) {
+                                        await FirestoreMethods()
+                                            .uploadNotivigation(
+                                          chatId: widget.chatingId,
+                                          unreadMessages: unreadMessages,
+                                          toUserID: widget.uiddd,
+                                        );
+                                      }
+                                      messageController.clear();
+                                    },
+                                    icon: Icon(Icons.send)))),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: TextField(
-                      controller: messageController,
-                      keyboardType: TextInputType.text,
-                      maxLines: 4,
-                      obscureText: false,
-                      decoration: decorationTextfield.copyWith(
-                          hintText: "Message as  ${userData.username}  ",
-                          suffixIcon: IconButton(
-                              onPressed: () async {
-                                messsageTexts.add(messageController.text);
-                                await FirestoreMethods().uploadMessage(
-                                    chatingID: widget.chatingId,
-                                    messsageText: messageController.text,
-                                    username: userData.username,
-                                    uid: userData.uid);
-
-                                // add unreadNumber(); if statue is not true make function to increase the unreadNumber
-
-                                if (!status) {
-                                  await FirestoreMethods().uploadNotivigation(
-                                    chatId: widget.chatingId,
-                                    messsageText: messsageTexts,
-                                    toUserID: widget.uiddd,
-                                  );
-                                }
-                                messageController.clear();
-                              },
-                              icon: Icon(Icons.send)))),
-                ),
-              ],
-            ),
-          )
         ],
       ),
     );

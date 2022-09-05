@@ -239,7 +239,9 @@ class _ProfileState extends State<Profile> {
                     await FirestoreMethods().uploadSingleChat(
                         context: context,
                         chatingMembers: itemSingleChat,
-                        chatingId: chatingId);
+                        chatingId: chatingId,
+                        uiddd: widget.uiddd
+                        );
 
                    await  FirestoreMethods().uploadChatfriends(
                       chatId: chatingId,
@@ -282,11 +284,14 @@ class _ProfileState extends State<Profile> {
                     //     }
                     //   ])
                     // });
-                    Navigator.push(
+                    // ignore: use_build_context_synchronously
+                    Navigator.push  (
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            ChatingOneToOne(chatingId: chatingId),
+                            ChatingOneToOne(chatingId: chatingId,
+                            username: widget.username,
+                                uiddd: widget.uiddd),
                       ),
                     );
                   } else {
@@ -302,7 +307,10 @@ class _ProfileState extends State<Profile> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                ChatingOneToOne(chatingId: chatingId),
+                                ChatingOneToOne(chatingId: chatingId,
+                                username: widget.username,
+                                uiddd: widget.uiddd
+                                ),
                           ),
                         );
                       }

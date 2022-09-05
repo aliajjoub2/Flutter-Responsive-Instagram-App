@@ -66,7 +66,10 @@ class FirestoreMethods {
   //----------------------------------------
 
   uploadSingleChat(
-      {required context, required chatingMembers, required chatingId}) async {
+      {required context,
+      required chatingMembers,
+      required chatingId,
+      required String uiddd}) async {
     String message = "ERROR => Not starting the code";
 
     try {
@@ -123,11 +126,11 @@ class FirestoreMethods {
       print("emptyyyyyyyy");
     }
   }
+
 // upload message in chating ont to one page
   uploadMessage(
       {required messsageText,
       required chatingID,
-      
       required username,
       required uid}) async {
     if (messsageText.isNotEmpty) {
@@ -138,7 +141,6 @@ class FirestoreMethods {
           .collection("chats_content")
           .doc(messageID)
           .set({
-        
         "username": username,
         "message": messsageText,
         "dataPublished": DateTime.now(),
@@ -149,59 +151,56 @@ class FirestoreMethods {
       print("empty message");
     }
   }
+
 // upload chat detaile to user page -----------------------------
- uploadChatfriends(
-      {required chatId,
-      required username,
-      required imagPath,
-      required toUserID,
-      required userId,
-      }) async {
-    bool status= false;
-      
-      await FirebaseFirestore.instance
-          .collection("userSSS")
-          .doc(toUserID)
-          .collection("chatFriends")
-          .doc(chatId)
-          .set({
-        "chatId": chatId,
-        "username": username,
-        "dataPublished": DateTime.now(),
-        "imagPath": imagPath,
-        "userId": userId,
-        "status": status
-        
-      });
-   
+  uploadChatfriends({
+    required chatId,
+    required username,
+    required imagPath,
+    required toUserID,
+    required userId,
+  }) async {
+    bool status = false;
+    bool block = false;
+    List unreadMessages = [];
+
+    await FirebaseFirestore.instance
+        .collection("userSSS")
+        .doc(toUserID)
+        .collection("chatFriends")
+        .doc(chatId)
+        .set({
+      "chatId": chatId,
+      "username": username,
+      "dataPublished": DateTime.now(),
+      "imagPath": imagPath,
+      "userId": userId,
+      "status": status,
+      "block": block,
+      "unreadMessages": unreadMessages
+    });
   }
 //---------------------------------
 
- uploadNotivigation(
-      {required chatId,
-     
-      
-      required toUserID,
-      
-       
-       required List messsageText,
-      }) async {
-    
-      
-      await FirebaseFirestore.instance
-          .collection("userSSS")
-          .doc(toUserID)
-          .collection("chatFriends")
-          .doc(chatId)
-          .set({
-        
+  uploadNotivigation({
+    required chatId,
+    required toUserID,
+    required List unreadMessages,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection("userSSS")
+        .doc(toUserID)
+        .collection("chatFriends")
+        .doc(chatId)
+        .set(
+      {
         "lastMessage": DateTime.now(),
-        
-        "unreadMessages": messsageText,
-        
-      }, SetOptions(merge: true),);
-   
+        "unreadMessages": unreadMessages,
+      },
+      SetOptions(merge: true),
+    );
   }
+
 //---------------------------------
   toggleLike({required Map postData}) async {
     try {
@@ -229,11 +228,11 @@ class FirestoreMethods {
 
   //-------------------
 // functoin to get user details from Firestore (Database), we use this function for provider
-   getChatID({required itemSingleChat}) async {
-     var snap2 = await FirebaseFirestore.instance
+  getChatID({required itemSingleChat}) async {
+    var snap2 = await FirebaseFirestore.instance
         .collection('chating')
         .where('chatingMembers', isEqualTo: itemSingleChat)
-        .get() ;
+        .get();
     return SingleChatData.convertSnapChatModel(snap2);
   }
 }

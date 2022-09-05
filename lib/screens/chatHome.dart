@@ -78,50 +78,69 @@ class _ChatshomeState extends State<Chatshome> {
                             ),
                           ),
                           trailing: SizedBox(
-                            width: 50,
+                            width: 100,
                             child: Row(
                               children: [
                                 Text(data['unreadMessages'] != null &&
                                         data['unreadMessages'].length != 0
                                     ? data['unreadMessages'].length.toString()
                                     : ''),
+                                Text(data['unreadMessages'] != null &&
+                                        data['unreadMessages'].length != 0
+                                    ? '-- ${(data['lastMessage'] as Timestamp).toDate().hour.toString()}:${(data['lastMessage'] as Timestamp).toDate().minute.toString()}'
+                                    : ''),
+
+                                // ((data['lastMessage'].toString().isNotEmpty)) ?
+                                // Text('${(data['lastMessage'][0] as Timestamp).toDate().hour.toString()}:')
+                                // : Text('')
                               ],
                             ),
                           ),
                           onTap: () async {
+                            List unreadMessages = [];
+                            // print(
+                            //     '-----------------------kkkkkkkkkkkkkkkkkkkk');
+                            // print(data['lastMessage']);
                             // here muss delete the unread Number
                             await FirebaseFirestore.instance
                                 .collection("userSSS")
                                 .doc(FirebaseAuth.instance.currentUser!.uid)
                                 .collection("chatFriends")
                                 .doc(data['chatId'])
-                                .update(
-                                    {"unreadMessages": FieldValue.delete()});
-                                  // change status to true 
-                                    await FirebaseFirestore.instance
+                                .update({"unreadMessages": unreadMessages});
+
+                            // remove the latst message date
+                            // await FirebaseFirestore.instance
+                            //     .collection("userSSS")
+                            //     .doc(FirebaseAuth.instance.currentUser!.uid)
+                            //     .collection("chatFriends")
+                            //     .doc(data['chatId'])
+                            //     .update({"lastMessage": FieldValue.delete()});
+                            // change status to true
+                            await FirebaseFirestore.instance
                                 .collection("userSSS")
                                 .doc(FirebaseAuth.instance.currentUser!.uid)
                                 .collection("chatFriends")
                                 .doc(data['chatId'])
-                                .update(
-                                    {"status": true});
-                            
+                                .update({"status": true});
+
+                            // ignore: use_build_context_synchronously
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ChatingOneToOne(
-                                      chatingId: data['chatId'],
-                                      uiddd: data['userId']),
-                                )).then((context) async {
-                                  // change status to true 
-                                    await FirebaseFirestore.instance
-                                .collection("userSSS")
-                                .doc(FirebaseAuth.instance.currentUser!.uid)
-                                .collection("chatFriends")
-                                .doc(data['chatId'])
-                                .update(
-                                    {"status": false});
-                              
+                                    builder: (context) => ChatingOneToOne(
+                                          chatingId: data['chatId'],
+                                          uiddd: data['userId'],
+                                          username: data['username'],
+                                        ) // another username for chat memeber
+                                    )).then((context) async {
+                              // change status to true
+                              await FirebaseFirestore.instance
+                                  .collection("userSSS")
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .collection("chatFriends")
+                                  .doc(data['chatId'])
+                                  .update({"status": false});
                             });
 
                             // muss send the statue will true and send userid for another user with data back
