@@ -7,6 +7,9 @@ import 'package:provider/provider.dart';
 
 import '../provider/user_provider.dart';
 import '../screens/add_post.dart';
+import '../screens/audio_dragablescheet.dart';
+import '../screens/audio_list.dart';
+import '../screens/audio_player.dart';
 import '../screens/home.dart';
 import '../screens/profile.dart';
 import '../screens/search.dart';
@@ -98,7 +101,10 @@ class _WebScerrenState extends State<WebScerren> {
           Home(),
           Search(),
           AddPost(),
-          Center(child: Text("Love u ♥")),
+          //AudioPlayerBackgroundPlaylist(),
+          //Episode6PlaylistView(),
+          AudioPlayerDragablesheet(),
+        
           Profile(uiddd: FirebaseAuth.instance.currentUser!.uid,
           username: userData!.username ,
           imagPath: userData.profileImg),

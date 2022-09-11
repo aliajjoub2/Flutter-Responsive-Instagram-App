@@ -6,6 +6,9 @@ import 'package:provider/provider.dart';
 
 import '../provider/user_provider.dart';
 import '../screens/add_post.dart';
+import '../screens/audio_dragablescheet.dart';
+import '../screens/audio_list.dart';
+import '../screens/audio_player.dart';
 import '../screens/chatHome.dart';
 import '../screens/home.dart';
 import '../screens/myProfile.dart';
@@ -72,10 +75,16 @@ class _MobileScerrenState extends State<MobileScerren> {
                   color: currentPage == 3 ? primaryColor : secondaryColor,
                 ),
                 label: ""),
-            BottomNavigationBarItem(
+            // BottomNavigationBarItem(
+            //     icon: Icon(
+            //       Icons.person,
+            //       color: currentPage == 4 ? primaryColor : secondaryColor,
+            //     ),
+            //     label: ""),
+                BottomNavigationBarItem(
                 icon: Icon(
-                  Icons.person,
-                  color: currentPage == 4 ? primaryColor : secondaryColor,
+                  Icons.auto_awesome_mosaic_rounded,
+                  color: currentPage == 5 ? primaryColor : secondaryColor,
                 ),
                 label: ""),
           ]),
@@ -91,7 +100,10 @@ class _MobileScerrenState extends State<MobileScerren> {
           Search(),
           AddPost(),
           Chatshome(),
-          MyProfile(),
+          //MyProfile(),
+           //AudioPlayerBackgroundPlaylist(),
+          //Episode6PlaylistView(),
+          AudioPlayerDragablesheet(),
         ],
       ),
     );
