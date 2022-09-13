@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../provider/user_provider.dart';
 import '../screens/add_post.dart';
 import '../screens/audio_dragablescheet.dart';
+import '../screens/audio_finish.dart';
 import '../screens/audio_list.dart';
 import '../screens/audio_player.dart';
 import '../screens/home.dart';
@@ -103,7 +104,8 @@ class _WebScerrenState extends State<WebScerren> {
           AddPost(),
           //AudioPlayerBackgroundPlaylist(),
           //Episode6PlaylistView(),
-          AudioPlayerDragablesheet(),
+          //AudioPlayerDragablesheet(),
+          Episode6PlaylistView(),
         
           Profile(uiddd: FirebaseAuth.instance.currentUser!.uid,
           username: userData!.username ,

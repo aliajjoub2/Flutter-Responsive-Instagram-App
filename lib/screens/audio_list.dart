@@ -2,12 +2,14 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class Episode6PlaylistView extends StatefulWidget {
+class EpisodoooPlaylistView extends StatefulWidget {
+  const EpisodoooPlaylistView({Key? key}) : super(key: key);
+
   @override
-  _Episode6PlaylistViewState createState() => _Episode6PlaylistViewState();
+  _EpisodoooPlaylistViewState createState() => _EpisodoooPlaylistViewState();
 }
 
-class _Episode6PlaylistViewState extends State<Episode6PlaylistView> {
+class _EpisodoooPlaylistViewState extends State<EpisodoooPlaylistView> {
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer();
   double screenHeight = 0;
   double screenWidth = 0;
